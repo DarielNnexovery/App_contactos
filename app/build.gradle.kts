@@ -42,7 +42,8 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
 
-    // Firebase Firestore (para la base de datos de contactos)
+    // Firebase Auth & Firestore
+    implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 
     implementation(libs.androidx.activity.ktx)

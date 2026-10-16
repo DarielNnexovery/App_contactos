@@ -8,6 +8,7 @@ import com.example.app_contactos.R
 import com.example.app_contactos.model.Contacto
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class AgregarContactoActivity : AppCompatActivity() {
@@ -18,6 +19,7 @@ class AgregarContactoActivity : AppCompatActivity() {
     private lateinit var btnGuardar: Button
     private lateinit var toolbar: MaterialToolbar
 
+    private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +56,19 @@ class AgregarContactoActivity : AppCompatActivity() {
     }
 
     private fun guardarEnFirebase(nombre: String, telefono: String, email: String) {
+        val currentUserId = auth.currentUser?.uid ?: ""
+        if (currentUserId.isEmpty()) {
+            Toast.makeText(this, "Sesión no válida", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         btnGuardar.isEnabled = false
-        val nuevoContacto = Contacto(nombre = nombre, telefono = telefono, email = email)
+        val nuevoContacto = Contacto(
+            userId = currentUserId,
+            nombre = nombre,
+            telefono = telefono,
+            email = email
+        )
 
         db.collection("contactos")
             .add(nuevoContacto)

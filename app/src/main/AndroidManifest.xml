@@ -21,6 +21,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.LoginActivity"
+            android:exported="false"
+            android:label="Iniciar Sesión" />
+        <activity
+            android:name=".ui.RegistroActivity"
+            android:exported="false"
+            android:label="Registro de Usuario" />
+        <activity
             android:name=".ui.AgregarContactoActivity"
             android:exported="false"
             android:label="Agregar Contacto" />
