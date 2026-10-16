@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         toolbar = findViewById(R.id.toolbar)
+        toolbar.subtitle = auth.currentUser?.email
         setSupportActionBar(toolbar)
 
         rvContactos = findViewById(R.id.rvContactos)

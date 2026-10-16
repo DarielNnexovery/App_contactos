@@ -46,6 +46,17 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Si ya hay una sesión activa, ir directamente a la pantalla principal
+        if (auth.currentUser != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
+    }
+
     private fun validarCampos(): Boolean {
         var esValido = true
         val email = etEmail.text.toString().trim()
