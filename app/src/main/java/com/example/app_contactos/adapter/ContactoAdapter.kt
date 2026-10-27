@@ -16,6 +16,7 @@ class ContactoAdapter(
     class ContactoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvNombre: TextView = itemView.findViewById(R.id.tvNombreContacto)
         val tvTelefono: TextView = itemView.findViewById(R.id.tvTelefonoContacto)
+        val tvInicial: TextView = itemView.findViewById(R.id.tvInicialContacto)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactoViewHolder {
@@ -27,6 +28,8 @@ class ContactoAdapter(
         val contacto = contactos[position]
         holder.tvNombre.text = contacto.nombre
         holder.tvTelefono.text = contacto.telefono
+        holder.tvInicial.text = if (contacto.nombre.isNotEmpty()) contacto.nombre.take(1).uppercase() else "C"
+
         holder.itemView.setOnClickListener { onItemClick(contacto) }
     }
 

@@ -1,7 +1,6 @@
 package com.example.app_contactos.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -61,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         rvContactos.layoutManager = LinearLayoutManager(this)
         adapter = ContactoAdapter(emptyList()) { contacto ->
-            mostrarOpcionesContacto(contacto)
+            abrirDetalleContacto(contacto)
         }
         rvContactos.adapter = adapter
 
@@ -122,7 +120,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                // Ordenar por nombre alfabéticamente
                 lista.sortBy { it.nombre.lowercase() }
                 listaContactosCompleta = lista
 
@@ -150,60 +147,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarOpcionesContacto(contacto: Contacto) {
-        val emailTexto = if (contacto.email.isNotEmpty()) "\nEmail: ${contacto.email}" else ""
-
-        val opciones = arrayOf("Llamar", "Editar", "Eliminar")
-        AlertDialog.Builder(this)
-            .setTitle(contacto.nombre)
-            .setMessage("Teléfono: ${contacto.telefono}$emailTexto")
-            .setItems(opciones) { _, which ->
-                when (which) {
-                    0 -> llamarContacto(contacto.telefono)
-                    1 -> {
-                        val intent = Intent(this, AgregarContactoActivity::class.java).apply {
-                            putExtra("EXTRA_CONTACTO_ID", contacto.id)
-                            putExtra("EXTRA_CONTACTO_NOMBRE", contacto.nombre)
-                            putExtra("EXTRA_CONTACTO_TELEFONO", contacto.telefono)
-                            putExtra("EXTRA_CONTACTO_EMAIL", contacto.email)
-                        }
-                        startActivity(intent)
-                    }
-                    2 -> confirmarEliminarContacto(contacto)
-                }
-            }
-            .setPositiveButton("Cerrar", null)
-            .show()
-    }
-
-    private fun llamarContacto(telefono: String) {
-        if (telefono.isNotEmpty()) {
-            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$telefono"))
-            startActivity(intent)
+    private fun abrirDetalleContacto(contacto: Contacto) {
+        val intent = Intent(this, DetalleContactoActivity::class.java).apply {
+            putExtra("EXTRA_CONTACTO_ID", contacto.id)
+            putExtra("EXTRA_CONTACTO_NOMBRE", contacto.nombre)
+            putExtra("EXTRA_CONTACTO_TELEFONO", contacto.telefono)
+            putExtra("EXTRA_CONTACTO_EMAIL", contacto.email)
         }
-    }
-
-    private fun confirmarEliminarContacto(contacto: Contacto) {
-        AlertDialog.Builder(this)
-            .setTitle("Eliminar contacto")
-            .setMessage("¿Deseas eliminar a '${contacto.nombre}'?")
-            .setPositiveButton("Sí, eliminar") { _, _ ->
-                eliminarContacto(contacto.id)
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
-    }
-
-    private fun eliminarContacto(contactoId: String) {
-        if (contactoId.isEmpty()) return
-
-        db.collection("contactos").document(contactoId)
-            .delete()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Contacto eliminado", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al eliminar: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+        startActivity(intent)
     }
 }

@@ -44,6 +44,10 @@
             android:name=".ui.AgregarContactoActivity"
             android:exported="false"
             android:label="Agregar Contacto" />
+        <activity
+            android:name=".ui.DetalleContactoActivity"
+            android:exported="false"
+            android:label="Detalle del Contacto" />
     </application>
 
 </manifest>
