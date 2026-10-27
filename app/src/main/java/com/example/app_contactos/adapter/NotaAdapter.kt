@@ -7,6 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.app_contactos.R
 import com.example.app_contactos.model.Nota
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class NotaAdapter(
     private var notas: List<Nota>,
@@ -16,6 +19,7 @@ class NotaAdapter(
     class NotaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTitulo: TextView = itemView.findViewById(R.id.tvTituloNota)
         val tvContenido: TextView = itemView.findViewById(R.id.tvContenidoNota)
+        val tvFecha: TextView = itemView.findViewById(R.id.tvFechaNota)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotaViewHolder {
@@ -27,6 +31,10 @@ class NotaAdapter(
         val nota = notas[position]
         holder.tvTitulo.text = nota.titulo
         holder.tvContenido.text = nota.contenido
+
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        holder.tvFecha.text = sdf.format(Date(nota.fecha))
+
         holder.itemView.setOnClickListener { onItemClick(nota) }
     }
 

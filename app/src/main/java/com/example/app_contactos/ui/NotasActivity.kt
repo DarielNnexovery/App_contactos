@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +16,9 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class NotasActivity : AppCompatActivity() {
 
@@ -49,7 +53,7 @@ class NotasActivity : AppCompatActivity() {
 
         rvNotas.layoutManager = LinearLayoutManager(this)
         adapter = NotaAdapter(emptyList()) { nota ->
-            Toast.makeText(this, "Nota: ${nota.titulo}", Toast.LENGTH_SHORT).show()
+            mostrarDetalleNotaDialog(nota)
         }
         rvNotas.adapter = adapter
 
@@ -81,6 +85,9 @@ class NotasActivity : AppCompatActivity() {
                     }
                 }
 
+                // Ordenar notas de la más reciente a la más antigua
+                lista.sortByDescending { it.fecha }
+
                 if (lista.isEmpty()) {
                     tvEmptyStateNotas.visibility = View.VISIBLE
                     rvNotas.visibility = View.GONE
@@ -89,6 +96,32 @@ class NotasActivity : AppCompatActivity() {
                     rvNotas.visibility = View.VISIBLE
                     adapter.actualizarLista(lista)
                 }
+            }
+    }
+
+    private fun mostrarDetalleNotaDialog(nota: Nota) {
+        val fechaFormateada = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(nota.fecha))
+
+        AlertDialog.Builder(this)
+            .setTitle(nota.titulo)
+            .setMessage("Fecha: $fechaFormateada\n\n${nota.contenido}")
+            .setPositiveButton("Cerrar", null)
+            .setNegativeButton("Eliminar") { _, _ ->
+                eliminarNota(nota.id)
+            }
+            .show()
+    }
+
+    private fun eliminarNota(notaId: String) {
+        if (notaId.isEmpty()) return
+
+        db.collection("notas").document(notaId)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Nota eliminada", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al eliminar: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 }
