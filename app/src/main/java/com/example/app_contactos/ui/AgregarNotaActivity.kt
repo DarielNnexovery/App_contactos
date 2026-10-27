@@ -21,6 +21,8 @@ class AgregarNotaActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
+    private var notaIdEdicion: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_agregar_nota)
@@ -29,6 +31,15 @@ class AgregarNotaActivity : AppCompatActivity() {
         etTituloNota = findViewById(R.id.etTituloNota)
         etContenidoNota = findViewById(R.id.etContenidoNota)
         btnGuardarNota = findViewById(R.id.btnGuardarNota)
+
+        // Verificar si se abrió en modo edición
+        notaIdEdicion = intent.getStringExtra("EXTRA_NOTA_ID")
+        if (notaIdEdicion != null) {
+            toolbarAgregarNota.title = "Editar Nota"
+            btnGuardarNota.text = "Actualizar Nota"
+            etTituloNota.setText(intent.getStringExtra("EXTRA_NOTA_TITULO"))
+            etContenidoNota.setText(intent.getStringExtra("EXTRA_NOTA_CONTENIDO"))
+        }
 
         toolbarAgregarNota.setNavigationOnClickListener {
             finish()
@@ -48,7 +59,11 @@ class AgregarNotaActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            guardarNotaEnFirebase(titulo, contenido)
+            if (notaIdEdicion != null) {
+                actualizarNotaEnFirebase(notaIdEdicion!!, titulo, contenido)
+            } else {
+                guardarNotaEnFirebase(titulo, contenido)
+            }
         }
     }
 
@@ -75,6 +90,27 @@ class AgregarNotaActivity : AppCompatActivity() {
             .addOnFailureListener { error ->
                 btnGuardarNota.isEnabled = true
                 Toast.makeText(this, "Error al guardar nota: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun actualizarNotaEnFirebase(id: String, titulo: String, contenido: String) {
+        btnGuardarNota.isEnabled = false
+
+        val datos = mapOf(
+            "titulo" to titulo,
+            "contenido" to contenido,
+            "fecha" to System.currentTimeMillis()
+        )
+
+        db.collection("notas").document(id)
+            .update(datos)
+            .addOnSuccessListener {
+                Toast.makeText(this, "¡Nota actualizada con éxito!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener { error ->
+                btnGuardarNota.isEnabled = true
+                Toast.makeText(this, "Error al actualizar nota: ${error.message}", Toast.LENGTH_LONG).show()
             }
     }
 }

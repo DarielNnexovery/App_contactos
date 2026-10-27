@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         rvContactos.layoutManager = LinearLayoutManager(this)
         adapter = ContactoAdapter(emptyList()) { contacto ->
-            Toast.makeText(this, "Contacto: ${contacto.nombre}", Toast.LENGTH_SHORT).show()
+            mostrarOpcionesContacto(contacto)
         }
         rvContactos.adapter = adapter
 
@@ -115,6 +116,52 @@ class MainActivity : AppCompatActivity() {
                     rvContactos.visibility = View.VISIBLE
                     adapter.actualizarLista(lista)
                 }
+            }
+    }
+
+    private fun mostrarOpcionesContacto(contacto: Contacto) {
+        val emailTexto = if (contacto.email.isNotEmpty()) "\nEmail: ${contacto.email}" else ""
+
+        AlertDialog.Builder(this)
+            .setTitle(contacto.nombre)
+            .setMessage("Teléfono: ${contacto.telefono}$emailTexto")
+            .setPositiveButton("Cerrar", null)
+            .setNeutralButton("Editar") { _, _ ->
+                val intent = Intent(this, AgregarContactoActivity::class.java).apply {
+                    putExtra("EXTRA_CONTACTO_ID", contacto.id)
+                    putExtra("EXTRA_CONTACTO_NOMBRE", contacto.nombre)
+                    putExtra("EXTRA_CONTACTO_TELEFONO", contacto.telefono)
+                    putExtra("EXTRA_CONTACTO_EMAIL", contacto.email)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("Eliminar") { _, _ ->
+                confirmarEliminarContacto(contacto)
+            }
+            .show()
+    }
+
+    private fun confirmarEliminarContacto(contacto: Contacto) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar contacto")
+            .setMessage("¿Deseas eliminar a '${contacto.nombre}'?")
+            .setPositiveButton("Sí, eliminar") { _, _ ->
+                eliminarContacto(contacto.id)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun eliminarContacto(contactoId: String) {
+        if (contactoId.isEmpty()) return
+
+        db.collection("contactos").document(contactoId)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Contacto eliminado", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al eliminar: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 }

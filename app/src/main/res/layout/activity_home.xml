@@ -110,6 +110,7 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvCountContactos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Guarda y gestiona tus contactos"
@@ -168,6 +169,7 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvCountNotas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Crea y revisa tus notas personales"

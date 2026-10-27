@@ -11,17 +11,21 @@ import com.example.app_contactos.R
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var toolbarHome: MaterialToolbar
     private lateinit var tvBienvenida: TextView
+    private lateinit var tvCountContactos: TextView
+    private lateinit var tvCountNotas: TextView
     private lateinit var cardContactos: MaterialCardView
     private lateinit var cardNotas: MaterialCardView
     private lateinit var btnIrContactos: Button
     private lateinit var btnIrNotas: Button
 
     private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +42,8 @@ class HomeActivity : AppCompatActivity() {
         setSupportActionBar(toolbarHome)
 
         tvBienvenida = findViewById(R.id.tvBienvenida)
+        tvCountContactos = findViewById(R.id.tvCountContactos)
+        tvCountNotas = findViewById(R.id.tvCountNotas)
         cardContactos = findViewById(R.id.cardContactos)
         cardNotas = findViewById(R.id.cardNotas)
         btnIrContactos = findViewById(R.id.btnIrContactos)
@@ -62,6 +68,28 @@ class HomeActivity : AppCompatActivity() {
         }
         cardNotas.setOnClickListener { abrirNotas() }
         btnIrNotas.setOnClickListener { abrirNotas() }
+
+        cargarContadores()
+    }
+
+    private fun cargarContadores() {
+        val userId = auth.currentUser?.uid ?: return
+
+        // Contador de Contactos
+        db.collection("contactos")
+            .whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, _ ->
+                val count = snapshot?.size() ?: 0
+                tvCountContactos.text = if (count == 1) "1 contacto guardado" else "$count contactos guardados"
+            }
+
+        // Contador de Notas
+        db.collection("notas")
+            .whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, _ ->
+                val count = snapshot?.size() ?: 0
+                tvCountNotas.text = if (count == 1) "1 nota guardada" else "$count notas guardadas"
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

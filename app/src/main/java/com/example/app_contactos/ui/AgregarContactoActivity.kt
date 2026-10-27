@@ -22,6 +22,8 @@ class AgregarContactoActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
+    private var contactoIdEdicion: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_agregar_contacto)
@@ -31,6 +33,15 @@ class AgregarContactoActivity : AppCompatActivity() {
         etTelefono = findViewById(R.id.etTelefono)
         etEmail = findViewById(R.id.etEmail)
         btnGuardar = findViewById(R.id.btnGuardar)
+
+        contactoIdEdicion = intent.getStringExtra("EXTRA_CONTACTO_ID")
+        if (contactoIdEdicion != null) {
+            toolbar.title = "Editar Contacto"
+            btnGuardar.text = "Actualizar Contacto"
+            etNombre.setText(intent.getStringExtra("EXTRA_CONTACTO_NOMBRE"))
+            etTelefono.setText(intent.getStringExtra("EXTRA_CONTACTO_TELEFONO"))
+            etEmail.setText(intent.getStringExtra("EXTRA_CONTACTO_EMAIL"))
+        }
 
         toolbar.setNavigationOnClickListener {
             finish()
@@ -51,7 +62,11 @@ class AgregarContactoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            guardarEnFirebase(nombre, telefono, email)
+            if (contactoIdEdicion != null) {
+                actualizarContacto(contactoIdEdicion!!, nombre, telefono, email)
+            } else {
+                guardarEnFirebase(nombre, telefono, email)
+            }
         }
     }
 
@@ -79,6 +94,27 @@ class AgregarContactoActivity : AppCompatActivity() {
             .addOnFailureListener { error ->
                 btnGuardar.isEnabled = true
                 Toast.makeText(this, "Error al guardar: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun actualizarContacto(id: String, nombre: String, telefono: String, email: String) {
+        btnGuardar.isEnabled = false
+
+        val datos = mapOf(
+            "nombre" to nombre,
+            "telefono" to telefono,
+            "email" to email
+        )
+
+        db.collection("contactos").document(id)
+            .update(datos)
+            .addOnSuccessListener {
+                Toast.makeText(this, "¡Contacto actualizado con éxito!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener { error ->
+                btnGuardar.isEnabled = true
+                Toast.makeText(this, "Error al actualizar: ${error.message}", Toast.LENGTH_LONG).show()
             }
     }
 }

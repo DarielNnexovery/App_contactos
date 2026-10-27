@@ -106,9 +106,28 @@ class NotasActivity : AppCompatActivity() {
             .setTitle(nota.titulo)
             .setMessage("Fecha: $fechaFormateada\n\n${nota.contenido}")
             .setPositiveButton("Cerrar", null)
+            .setNeutralButton("Editar") { _, _ ->
+                val intent = Intent(this, AgregarNotaActivity::class.java).apply {
+                    putExtra("EXTRA_NOTA_ID", nota.id)
+                    putExtra("EXTRA_NOTA_TITULO", nota.titulo)
+                    putExtra("EXTRA_NOTA_CONTENIDO", nota.contenido)
+                }
+                startActivity(intent)
+            }
             .setNegativeButton("Eliminar") { _, _ ->
+                confirmarEliminarNota(nota)
+            }
+            .show()
+    }
+
+    private fun confirmarEliminarNota(nota: Nota) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar nota")
+            .setMessage("¿Estás seguro de que deseas eliminar la nota '${nota.titulo}'?")
+            .setPositiveButton("Sí, eliminar") { _, _ ->
                 eliminarNota(nota.id)
             }
+            .setNegativeButton("Cancelar", null)
             .show()
     }
 
