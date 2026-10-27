@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App_contactos">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,6 +20,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:label="Mis Contactos" />
+        <activity
+            android:name=".ui.NotasActivity"
+            android:exported="false"
+            android:label="Mis Notas" />
+        <activity
+            android:name=".ui.AgregarNotaActivity"
+            android:exported="false"
+            android:label="Nueva Nota" />
         <activity
             android:name=".ui.LoginActivity"
             android:exported="false"

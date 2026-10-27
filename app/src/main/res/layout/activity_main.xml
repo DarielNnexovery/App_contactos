@@ -18,7 +18,8 @@
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:title="Mis Contactos"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@android:drawable/ic_menu_revert" />
 
         <TextView
             android:id="@+id/tvEmptyState"

@@ -43,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         toolbar.subtitle = auth.currentUser?.email
         setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
 
         rvContactos = findViewById(R.id.rvContactos)
         tvEmptyState = findViewById(R.id.tvEmptyState)
