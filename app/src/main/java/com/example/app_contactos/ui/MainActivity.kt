@@ -1,7 +1,10 @@
 package com.example.app_contactos.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,12 +19,14 @@ import com.example.app_contactos.adapter.ContactoAdapter
 import com.example.app_contactos.model.Contacto
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var toolbar: MaterialToolbar
+    private lateinit var etBuscarContacto: TextInputEditText
     private lateinit var rvContactos: RecyclerView
     private lateinit var tvEmptyState: TextView
     private lateinit var fabAgregarContacto: FloatingActionButton
@@ -30,10 +35,11 @@ class MainActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
+    private var listaContactosCompleta = listOf<Contacto>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Verificar si el usuario ha iniciado sesión
         if (auth.currentUser == null) {
             irALogin()
             return
@@ -48,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
+        etBuscarContacto = findViewById(R.id.etBuscarContacto)
         rvContactos = findViewById(R.id.rvContactos)
         tvEmptyState = findViewById(R.id.tvEmptyState)
         fabAgregarContacto = findViewById(R.id.fabAgregarContacto)
@@ -58,11 +65,18 @@ class MainActivity : AppCompatActivity() {
         }
         rvContactos.adapter = adapter
 
-        // Navegación a la pantalla de Agregar Contacto
         fabAgregarContacto.setOnClickListener {
             val intent = Intent(this, AgregarContactoActivity::class.java)
             startActivity(intent)
         }
+
+        etBuscarContacto.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filtrarContactos(s.toString())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         cargarContactosDeFirebase()
     }
@@ -108,37 +122,65 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                if (lista.isEmpty()) {
-                    tvEmptyState.visibility = View.VISIBLE
-                    rvContactos.visibility = View.GONE
-                } else {
-                    tvEmptyState.visibility = View.GONE
-                    rvContactos.visibility = View.VISIBLE
-                    adapter.actualizarLista(lista)
-                }
+                // Ordenar por nombre alfabéticamente
+                lista.sortBy { it.nombre.lowercase() }
+                listaContactosCompleta = lista
+
+                filtrarContactos(etBuscarContacto.text.toString())
             }
+    }
+
+    private fun filtrarContactos(query: String) {
+        val q = query.trim().lowercase()
+        val listaFiltrada = if (q.isEmpty()) {
+            listaContactosCompleta
+        } else {
+            listaContactosCompleta.filter {
+                it.nombre.lowercase().contains(q) || it.telefono.contains(q)
+            }
+        }
+
+        if (listaFiltrada.isEmpty()) {
+            tvEmptyState.visibility = View.VISIBLE
+            rvContactos.visibility = View.GONE
+        } else {
+            tvEmptyState.visibility = View.GONE
+            rvContactos.visibility = View.VISIBLE
+            adapter.actualizarLista(listaFiltrada)
+        }
     }
 
     private fun mostrarOpcionesContacto(contacto: Contacto) {
         val emailTexto = if (contacto.email.isNotEmpty()) "\nEmail: ${contacto.email}" else ""
 
+        val opciones = arrayOf("Llamar", "Editar", "Eliminar")
         AlertDialog.Builder(this)
             .setTitle(contacto.nombre)
             .setMessage("Teléfono: ${contacto.telefono}$emailTexto")
-            .setPositiveButton("Cerrar", null)
-            .setNeutralButton("Editar") { _, _ ->
-                val intent = Intent(this, AgregarContactoActivity::class.java).apply {
-                    putExtra("EXTRA_CONTACTO_ID", contacto.id)
-                    putExtra("EXTRA_CONTACTO_NOMBRE", contacto.nombre)
-                    putExtra("EXTRA_CONTACTO_TELEFONO", contacto.telefono)
-                    putExtra("EXTRA_CONTACTO_EMAIL", contacto.email)
+            .setItems(opciones) { _, which ->
+                when (which) {
+                    0 -> llamarContacto(contacto.telefono)
+                    1 -> {
+                        val intent = Intent(this, AgregarContactoActivity::class.java).apply {
+                            putExtra("EXTRA_CONTACTO_ID", contacto.id)
+                            putExtra("EXTRA_CONTACTO_NOMBRE", contacto.nombre)
+                            putExtra("EXTRA_CONTACTO_TELEFONO", contacto.telefono)
+                            putExtra("EXTRA_CONTACTO_EMAIL", contacto.email)
+                        }
+                        startActivity(intent)
+                    }
+                    2 -> confirmarEliminarContacto(contacto)
                 }
-                startActivity(intent)
             }
-            .setNegativeButton("Eliminar") { _, _ ->
-                confirmarEliminarContacto(contacto)
-            }
+            .setPositiveButton("Cerrar", null)
             .show()
+    }
+
+    private fun llamarContacto(telefono: String) {
+        if (telefono.isNotEmpty()) {
+            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$telefono"))
+            startActivity(intent)
+        }
     }
 
     private fun confirmarEliminarContacto(contacto: Contacto) {

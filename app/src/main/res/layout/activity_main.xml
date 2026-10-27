@@ -9,8 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/black">
+        android:orientation="vertical">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -20,6 +19,23 @@
             app:title="Mis Contactos"
             app:titleTextColor="@android:color/white"
             app:navigationIcon="@android:drawable/ic_menu_revert" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilBuscarContacto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:startIconDrawable="@android:drawable/ic_menu_search"
+            android:hint="Buscar por nombre o teléfono">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etBuscarContacto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/tvEmptyState"

@@ -17,6 +17,7 @@ class AgregarContactoActivity : AppCompatActivity() {
     private lateinit var etTelefono: TextInputEditText
     private lateinit var etEmail: TextInputEditText
     private lateinit var btnGuardar: Button
+    private lateinit var btnCancelarContacto: Button
     private lateinit var toolbar: MaterialToolbar
 
     private val auth = FirebaseAuth.getInstance()
@@ -33,6 +34,7 @@ class AgregarContactoActivity : AppCompatActivity() {
         etTelefono = findViewById(R.id.etTelefono)
         etEmail = findViewById(R.id.etEmail)
         btnGuardar = findViewById(R.id.btnGuardar)
+        btnCancelarContacto = findViewById(R.id.btnCancelarContacto)
 
         contactoIdEdicion = intent.getStringExtra("EXTRA_CONTACTO_ID")
         if (contactoIdEdicion != null) {
@@ -44,6 +46,10 @@ class AgregarContactoActivity : AppCompatActivity() {
         }
 
         toolbar.setNavigationOnClickListener {
+            finish()
+        }
+
+        btnCancelarContacto.setOnClickListener {
             finish()
         }
 

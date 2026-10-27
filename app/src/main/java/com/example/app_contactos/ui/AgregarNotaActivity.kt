@@ -16,6 +16,7 @@ class AgregarNotaActivity : AppCompatActivity() {
     private lateinit var etTituloNota: TextInputEditText
     private lateinit var etContenidoNota: TextInputEditText
     private lateinit var btnGuardarNota: Button
+    private lateinit var btnCancelarNota: Button
     private lateinit var toolbarAgregarNota: MaterialToolbar
 
     private val auth = FirebaseAuth.getInstance()
@@ -31,6 +32,7 @@ class AgregarNotaActivity : AppCompatActivity() {
         etTituloNota = findViewById(R.id.etTituloNota)
         etContenidoNota = findViewById(R.id.etContenidoNota)
         btnGuardarNota = findViewById(R.id.btnGuardarNota)
+        btnCancelarNota = findViewById(R.id.btnCancelarNota)
 
         // Verificar si se abrió en modo edición
         notaIdEdicion = intent.getStringExtra("EXTRA_NOTA_ID")
@@ -42,6 +44,10 @@ class AgregarNotaActivity : AppCompatActivity() {
         }
 
         toolbarAgregarNota.setNavigationOnClickListener {
+            finish()
+        }
+
+        btnCancelarNota.setOnClickListener {
             finish()
         }
 
@@ -88,7 +94,7 @@ class AgregarNotaActivity : AppCompatActivity() {
                 finish()
             }
             .addOnFailureListener { error ->
-                btnGuardarNota.isEnabled = true
+                btnGuardarNota.isEnabled = false
                 Toast.makeText(this, "Error al guardar nota: ${error.message}", Toast.LENGTH_LONG).show()
             }
     }
