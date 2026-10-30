@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">App_contactos</string>
+    <string name="app_name">Orbyn</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
+    <string name="confirmar_cerrar_sesion_titulo">Cerrar sesión</string>
+    <string name="confirmar_cerrar_sesion_mensaje">¿Estás seguro de que deseas cerrar sesión?</string>
+    <string name="cancelar">Cancelar</string>
 </resources>

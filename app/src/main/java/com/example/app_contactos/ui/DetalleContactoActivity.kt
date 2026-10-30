@@ -1,5 +1,8 @@
 package com.example.app_contactos.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -26,6 +29,7 @@ class DetalleContactoActivity : AppCompatActivity() {
     private lateinit var btnLlamar: Button
     private lateinit var btnMensaje: Button
     private lateinit var btnEmail: Button
+    private lateinit var btnCompartir: Button
     private lateinit var btnEditar: Button
     private lateinit var btnEliminar: Button
 
@@ -50,6 +54,7 @@ class DetalleContactoActivity : AppCompatActivity() {
         btnLlamar = findViewById(R.id.btnLlamarDetalle)
         btnMensaje = findViewById(R.id.btnMensajeDetalle)
         btnEmail = findViewById(R.id.btnEmailDetalle)
+        btnCompartir = findViewById(R.id.btnCompartirDetalle)
         btnEditar = findViewById(R.id.btnEditarDetalle)
         btnEliminar = findViewById(R.id.btnEliminarDetalle)
 
@@ -73,21 +78,42 @@ class DetalleContactoActivity : AppCompatActivity() {
             cardEmail.visibility = View.GONE
         }
 
+        // Copiar número al mantener presionado
+        tvTelefono.setOnLongClickListener {
+            copiarAlPortapapeles("Teléfono", telefono)
+            true
+        }
+
+        // 1. Llamada Telefónica
         btnLlamar.setOnClickListener {
             val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$telefono"))
             startActivity(intent)
         }
 
+        // 2. Mensaje de Texto (SMS)
         btnMensaje.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$telefono"))
             startActivity(intent)
         }
 
+        // 3. Enviar Correo
         btnEmail.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$email"))
             startActivity(intent)
         }
 
+        // 4. Compartir Contacto
+        btnCompartir.setOnClickListener {
+            val textoContacto = "Contacto: $nombre\nTeléfono: $telefono" + if (email.isNotEmpty()) "\nEmail: $email" else ""
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, textoContacto)
+                type = "text/plain"
+            }
+            startActivity(Intent.createChooser(sendIntent, "Compartir contacto via"))
+        }
+
+        // 5. Editar Contacto
         btnEditar.setOnClickListener {
             val intent = Intent(this, AgregarContactoActivity::class.java).apply {
                 putExtra("EXTRA_CONTACTO_ID", contactoId)
@@ -99,9 +125,17 @@ class DetalleContactoActivity : AppCompatActivity() {
             finish()
         }
 
+        // 6. Eliminar Contacto
         btnEliminar.setOnClickListener {
             confirmarEliminar()
         }
+    }
+
+    private fun copiarAlPortapapeles(etiqueta: String, texto: String) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText(etiqueta, texto)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, "$etiqueta copiado al portapapeles", Toast.LENGTH_SHORT).show()
     }
 
     private fun confirmarEliminar() {

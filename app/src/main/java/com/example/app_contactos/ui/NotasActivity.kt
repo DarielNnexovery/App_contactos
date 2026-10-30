@@ -46,6 +46,15 @@ class NotasActivity : AppCompatActivity() {
         toolbarNotas.setNavigationOnClickListener {
             finish()
         }
+        toolbarNotas.inflateMenu(R.menu.menu_main)
+        toolbarNotas.setOnMenuItemClickListener { item ->
+            if (item.itemId == R.id.action_logout) {
+                confirmarCerrarSesion()
+                true
+            } else {
+                false
+            }
+        }
 
         rvNotas = findViewById(R.id.rvNotas)
         tvEmptyStateNotas = findViewById(R.id.tvEmptyStateNotas)
@@ -142,5 +151,25 @@ class NotasActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al eliminar: ${e.message}", Toast.LENGTH_LONG).show()
             }
+    }
+
+    private fun confirmarCerrarSesion() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.confirmar_cerrar_sesion_titulo)
+            .setMessage(R.string.confirmar_cerrar_sesion_mensaje)
+            .setPositiveButton(R.string.cerrar_sesion) { _, _ ->
+                cerrarSesion()
+            }
+            .setNegativeButton(R.string.cancelar, null)
+            .show()
+    }
+
+    private fun cerrarSesion() {
+        auth.signOut()
+        Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

@@ -108,7 +108,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="8dp"
-                            android:text="Mensaje" />
+                            android:text="SMS / Mensaje" />
 
                     </LinearLayout>
 
@@ -121,7 +121,7 @@
                 android:id="@+id/cardEmailDetalle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp">
 
@@ -157,6 +157,15 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Botón Compartir -->
+            <Button
+                android:id="@+id/btnCompartirDetalle"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:text="Compartir Contacto" />
 
             <!-- Botones de Acción principales (Editar y Eliminar) -->
             <LinearLayout

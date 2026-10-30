@@ -1,6 +1,7 @@
 package com.example.app_contactos.ui
 
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -54,26 +55,51 @@ class AgregarContactoActivity : AppCompatActivity() {
         }
 
         btnGuardar.setOnClickListener {
-            val nombre = etNombre.text.toString().trim()
-            val telefono = etTelefono.text.toString().trim()
-            val email = etEmail.text.toString().trim()
+            if (validarCampos()) {
+                val nombre = etNombre.text.toString().trim()
+                val telefono = etTelefono.text.toString().trim()
+                val email = etEmail.text.toString().trim()
 
-            if (nombre.isEmpty()) {
-                etNombre.error = "Ingresa el nombre"
-                return@setOnClickListener
-            }
-
-            if (telefono.isEmpty()) {
-                etTelefono.error = "Ingresa el teléfono"
-                return@setOnClickListener
-            }
-
-            if (contactoIdEdicion != null) {
-                actualizarContacto(contactoIdEdicion!!, nombre, telefono, email)
-            } else {
-                guardarEnFirebase(nombre, telefono, email)
+                if (contactoIdEdicion != null) {
+                    actualizarContacto(contactoIdEdicion!!, nombre, telefono, email)
+                } else {
+                    guardarEnFirebase(nombre, telefono, email)
+                }
             }
         }
+    }
+
+    private fun validarCampos(): Boolean {
+        var esValido = true
+        val nombre = etNombre.text.toString().trim()
+        val telefono = etTelefono.text.toString().trim()
+        val email = etEmail.text.toString().trim()
+
+        if (nombre.isEmpty()) {
+            etNombre.error = "Ingresa el nombre completo"
+            esValido = false
+        } else {
+            etNombre.error = null
+        }
+
+        if (telefono.isEmpty()) {
+            etTelefono.error = "Ingresa el número de teléfono"
+            esValido = false
+        } else if (telefono.length < 7) {
+            etTelefono.error = "El teléfono debe tener al menos 7 dígitos"
+            esValido = false
+        } else {
+            etTelefono.error = null
+        }
+
+        if (email.isNotEmpty() && !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.error = "Ingresa un correo electrónico válido"
+            esValido = false
+        } else {
+            etEmail.error = null
+        }
+
+        return esValido
     }
 
     private fun guardarEnFirebase(nombre: String, telefono: String, email: String) {

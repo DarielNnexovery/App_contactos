@@ -188,6 +188,21 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Botón Cerrar Sesión -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCerrarSesion"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/cerrar_sesion"
+                app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                app:iconGravity="textStart"
+                android:textColor="?attr/colorError"
+                app:strokeColor="?attr/colorError"
+                app:iconTint="?attr/colorError" />
+
         </LinearLayout>
 
     </ScrollView>

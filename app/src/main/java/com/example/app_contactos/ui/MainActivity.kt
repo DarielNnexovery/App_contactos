@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -86,11 +87,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_logout) {
-            auth.signOut()
-            irALogin()
+            confirmarCerrarSesion()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun confirmarCerrarSesion() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.confirmar_cerrar_sesion_titulo)
+            .setMessage(R.string.confirmar_cerrar_sesion_mensaje)
+            .setPositiveButton(R.string.cerrar_sesion) { _, _ ->
+                cerrarSesion()
+            }
+            .setNegativeButton(R.string.cancelar, null)
+            .show()
+    }
+
+    private fun cerrarSesion() {
+        auth.signOut()
+        Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
+        irALogin()
     }
 
     private fun irALogin() {

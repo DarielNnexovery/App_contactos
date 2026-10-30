@@ -6,9 +6,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.app_contactos.R
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,6 +26,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var cardNotas: MaterialCardView
     private lateinit var btnIrContactos: Button
     private lateinit var btnIrNotas: Button
+    private lateinit var btnCerrarSesion: MaterialButton
 
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
@@ -48,6 +52,7 @@ class HomeActivity : AppCompatActivity() {
         cardNotas = findViewById(R.id.cardNotas)
         btnIrContactos = findViewById(R.id.btnIrContactos)
         btnIrNotas = findViewById(R.id.btnIrNotas)
+        btnCerrarSesion = findViewById(R.id.btnCerrarSesion)
 
         val email = auth.currentUser?.email ?: ""
         val usuario = if (email.contains("@")) email.substringBefore("@") else email
@@ -68,6 +73,10 @@ class HomeActivity : AppCompatActivity() {
         }
         cardNotas.setOnClickListener { abrirNotas() }
         btnIrNotas.setOnClickListener { abrirNotas() }
+
+        btnCerrarSesion.setOnClickListener {
+            confirmarCerrarSesion()
+        }
 
         cargarContadores()
     }
@@ -99,11 +108,27 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_logout) {
-            auth.signOut()
-            irALogin()
+            confirmarCerrarSesion()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun confirmarCerrarSesion() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.confirmar_cerrar_sesion_titulo)
+            .setMessage(R.string.confirmar_cerrar_sesion_mensaje)
+            .setPositiveButton(R.string.cerrar_sesion) { _, _ ->
+                cerrarSesion()
+            }
+            .setNegativeButton(R.string.cancelar, null)
+            .show()
+    }
+
+    private fun cerrarSesion() {
+        auth.signOut()
+        Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
+        irALogin()
     }
 
     private fun irALogin() {
